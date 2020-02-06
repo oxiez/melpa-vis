@@ -5,6 +5,16 @@
     <link rel="stylesheet" href="vis.css">
   </head>
   <body>
+    <div id="header">
+      <h2>MELPA (Milkyman's Emacs Lisp Package Archive) Dependency Graph</h2>
+      <div id="interaction">
+        Package: <input type="text" name="searchname" id="search" value="s">
+        Downloads: <input type="number" name="downloadmin" min="0" step="10000" value="100000" id="downloads">
+        <input type="checkbox" name="downloadnotnull" id="dnotnull"> Hide unknown downloads
+        <input type="button" name="filter" value="Filter" id="filter">
+        <input type="button" name="clear" value="Clear Filters (WARNING: Slow)" id="clear">
+      </div>
+    </div>
     <div id="graph_div"></div>
     
     <script type="text/javascript" src="index_bundle.js"></script>

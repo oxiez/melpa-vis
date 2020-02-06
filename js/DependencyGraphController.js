@@ -15,12 +15,31 @@ export default class DependencyGraphController {
         this.model = model;
         this.view = view;
 
+        view.registerListeners(this.filter.bind(this),
+                               this.clear.bind(this));
         simulation.registerListener(this.onTick.bind(this));
-        
+
         model.then(data => {
             view.displayGraph(data.nodes, data.links);
             simulation.updateGraph(data.nodes, data.links);
         });
+    }
+
+    filter() {
+        this.model.then(data => {
+            const results = data.getFilteredResults(this.view.filters);
+
+            if (results.nodes.length !== 0) {                
+                this.view.displayGraph(results.nodes, results.links);
+                this.simulation.updateGraph(results.nodes, results.links);
+            } else {
+                console.log("No results found.");
+            }
+        });
+    }
+
+    clear() {
+        
     }
 
     onTick() {

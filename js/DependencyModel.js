@@ -7,7 +7,7 @@ const DependencyModelFactory = (function() {
             const model = new DependencyModel(archive_url, downloads_url);
             return model.done.then(_ => model);
         }
-    }
+    };
 })();
 
 class DependencyModel {
@@ -23,6 +23,75 @@ class DependencyModel {
 
     get nodes() { return this.node_list; }
     get links() { return this.link_list; }
+
+    /**
+     * Returns a filtered node list and link list
+     */
+    getFilteredResults(filters) {
+        const search = filters.search;
+        const downloads = filters.downloads;
+        const dnotnull = filters.dnotnull;
+
+        let nodes = [];
+        let links = [];
+
+        if(search === "") {
+            nodes = this.nodes;
+            links = this.links;
+        } else if(search in this.index) {
+            const results = new Set(
+                [search].concat(this.getAncestors(this.index[search]))
+                        .concat(this.getDescendants(this.index[search]))
+            );
+
+            links = this.links.filter(
+                link => results.has(link.source.name) && results.has(link.target.name)
+            );
+            
+            nodes = Array.from(results)
+                         .map(name => this.index[name]);
+        }
+
+        return { nodes, links };
+    }
+
+    getAncestors(node) {
+        const visited = new Set();
+
+        // FIFO
+        const queue = [node.name];
+        while (queue.length != 0) {
+            const current = queue.shift();
+
+            this.index[current].parents.forEach(parent => {
+                if(!visited.has(parent)) {
+                    visited.add(parent);
+                    queue.push(parent);
+                }
+            });
+        }
+
+        return Array.from(visited);
+    }
+
+    getDescendants(node) {
+        const visited = new Set();
+
+        // FIFO
+        const queue = [node.name];
+        while (queue.length != 0) {
+            const current = queue.shift();
+
+            this.index[current].children.forEach(children => {
+                if(!visited.has(children)) {
+                    visited.add(children);
+                    queue.push(children);
+                }
+            });
+        }
+
+        return Array.from(visited);
+    }
 
     generateGraph(responses) {
         this.generateNodes(responses);
@@ -50,11 +119,14 @@ class DependencyModel {
                         name: parent,
                         desc: "A package not listed in MELPA.",
                         keywords: [],
-                        parents: []
-                    }
+                        parents: [],
+                        children: []
+                    };
 
-                    tmp.push(this.index[parent])
+                    tmp.push(this.index[parent]);
                 }
+
+                this.index[parent].children.push(node.name);
             }, this);
             
             if (node.name in downloads) {
@@ -88,7 +160,8 @@ class DependencyModel {
             desc: element["desc"],
             authors,
             keywords,
-            parents
+            parents,
+            children: []
         };
     }
 
