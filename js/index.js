@@ -1,5 +1,9 @@
+import ForceSimulation from "ForceSimulation";
 import DependencyGraphController from "DependencyGraphController";
+import DependencyGraphView from "DependencyGraphView";
 import { DependencyModelFactory, DepdendencyModel } from "DependencyModel";
 
-window.DependencyGraph = DependencyGraphController;
-window.DepdendencyModelFactory = DependencyModelFactory;
+window.DependencyGraphController = DependencyGraphController;
+window.DependencyModelFactory = DependencyModelFactory;
+window.DependencyGraphView = DependencyGraphView;
+window.ForceSimulation = ForceSimulation;

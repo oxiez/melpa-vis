@@ -5,7 +5,7 @@ const DependencyModelFactory = (function() {
     return {
         getInstance: function(archive_url, downloads_url) {
             const model = new DependencyModel(archive_url, downloads_url);
-            return model.done.then(model => model);
+            return model.done.then(_ => model);
         }
     }
 })();
@@ -18,49 +18,61 @@ class DependencyModel {
         const download_promise = d3.json(downloads_url);
 
         this.done = Promise.all([archive_promise, download_promise])
-                           .then(this.generateGraph);
-        
+                           .then(this.generateGraph.bind(this));
     }
 
-    get nodes() { return this.nodeList; }
-    get links() { return this.linkList; }
+    get nodes() { return this.node_list; }
+    get links() { return this.link_list; }
 
     generateGraph(responses) {
         this.generateNodes(responses);
         this.generateLinks();
     }
-
-    /**
-     * Returns an object containing an object of packages,
-     * a list of nodes, and a list of links.
-     * @param {number} json
-     */
+    
     generateNodes(responses) {
         const packages = responses[0];
         const downloads = responses[1];
 
         this.index = {};
-        this.nodeList = Object.keys(json).map(
+        this.node_list = Object.keys(packages).map(
             name => this.generateNode(name, packages[name])
         );
-        
-        this.nodeList.forEach(node => {
-            this.index[node.name] =  node;
 
+        const tmp = [];
+        
+        this.node_list.forEach(node => {
+            this.index[node.name] = node;
+
+            // Some packages come with deps outside of MELPA
+            node.parents.forEach(parent => {
+                if (!(parent in this.index)) {
+                    this.index[parent] = {
+                        name: parent,
+                        desc: "A package not listed in MELPA.",
+                        keywords: [],
+                        parents: []
+                    }
+
+                    tmp.push(this.index[parent])
+                }
+            }, this);
+            
             if (node.name in downloads) {
                 this.index[node.name]["downloads"] = downloads[node.name];
             }
         }, this);
+
+        this.node_list = this.node_list.concat(tmp);
     }
 
     /**
      * @param {string} name
-     * @param {Object} name
+     * @param {Object} element
      */
     generateNode(name, element) {
         let authors = null;
         let keywords = [];
-        let children = [];
+        let parents = [];
 
         if (element["props"] !== null) {
             authors = element["props"]["authors"];
@@ -68,7 +80,7 @@ class DependencyModel {
         }
 
         if (element["deps"] !== null) {
-            children = Object.keys(element["deps"]);
+            parents = Object.keys(element["deps"]);
         }
             
         return {
@@ -76,7 +88,7 @@ class DependencyModel {
             desc: element["desc"],
             authors,
             keywords,
-            children
+            parents
         };
     }
 
@@ -84,11 +96,11 @@ class DependencyModel {
      * Generate links based on this.nodes and this.index
      */
     generateLinks() {
-        this.linkList = [];
+        this.link_list = [];
 
-        this.nodeList.forEach(source => {
-            source.children.forEach(target => {
-                this.linkList.push({
+        this.node_list.forEach(target => {
+            target.parents.forEach(source => {
+                this.link_list.push({
                     source,
                     target
                 });

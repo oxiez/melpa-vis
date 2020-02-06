@@ -2,13 +2,18 @@
 <html>
   <head>
     <title>MELPA Dependency Graph</title>
+    <link rel="stylesheet" href="vis.css">
   </head>
   <body>
     <div id="graph_div"></div>
     
     <script type="text/javascript" src="index_bundle.js"></script>
     <script type="text/javascript">
-      const dep_graph = new DependencyGraph("#graph_div");
+      const view = new DependencyGraphView("#graph_div");
+      const m_promise = DependencyModelFactory.getInstance();
+      const simulation = new ForceSimulation();
+
+      const controller = new DependencyGraphController(simulation, m_promise, view);
     </script>
   </body>
 </html>
