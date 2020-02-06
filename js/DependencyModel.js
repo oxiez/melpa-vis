@@ -103,14 +103,15 @@ class DependencyModel {
         const downloads = responses[1];
 
         this.index = {};
-        this.node_list = Object.keys(packages).map(
-            name => this.generateNode(name, packages[name])
-        );
+        this.node_list = Object.keys(packages).map(name => {
+            const node = this.generateNode(name, packages[name]);
+            this.index[name] = node;
+            return node;
+        });
 
         const tmp = [];
         
         this.node_list.forEach(node => {
-            this.index[node.name] = node;
 
             // Some packages come with deps outside of MELPA
             node.parents.forEach(parent => {
