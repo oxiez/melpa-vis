@@ -99,7 +99,7 @@ export default class DependencyGraphView {
             .enter()
             .append("svg:circle")
             .attr("class", "node")
-            .attr("name", node => node.name)
+            // .attr("name", node => node.name)
             .attr("r", node => this.scaleNode(node));
     }
 

@@ -20,8 +20,9 @@ export default class DependencyGraphController {
         simulation.registerListener(this.onTick.bind(this));
 
         model.then(data => {
-            view.displayGraph(data.nodes, data.links);
-            simulation.updateGraph(data.nodes, data.links);
+            this.filter();
+            // view.displayGraph(data.nodes, data.links);
+            // simulation.updateGraph(data.nodes, data.links);
         });
     }
 

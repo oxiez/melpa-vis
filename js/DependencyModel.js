@@ -32,65 +32,73 @@ class DependencyModel {
         const downloads = filters.downloads;
         const dnotnull = filters.dnotnull;
 
-        let nodes = [];
-        let links = [];
+        let nodes = Object.keys(this.index);
 
-        if(search === "") {
-            nodes = this.nodes;
-            links = this.links;
-        } else if(search in this.index) {
-            const results = new Set(
-                [search].concat(this.getAncestors(this.index[search]))
-                        .concat(this.getDescendants(this.index[search]))
-            );
-
-            links = this.links.filter(
-                link => results.has(link.source.name) && results.has(link.target.name)
-            );
-            
-            nodes = Array.from(results)
-                         .map(name => this.index[name]);
+        if(search !== "" && search in this.index) {
+            nodes = [search].concat(this.getAncestors(search))
+                            .concat(this.getDescendants(search));
         }
 
-        return { nodes, links };
+        nodes = nodes.filter(node => {
+            if (node.downloads != null && node.downloads >= downloads)
+                return true;
+
+            if (node.downloads == null && dnotnull === false)
+                return true;
+
+            return false;
+        });
+
+        const test = {};
+        nodes.forEach(name => test[name] = this.index[name], this);
+
+        console.dir(this.links);
+        
+        const links = this.links.filter(link => {
+            return (link.source in test) && (link.target in test);
+        });
+        
+        return { nodes: nodes.map(name => this.index[name], this) , links };
     }
 
-    getAncestors(node) {
-        const visited = new Set();
+    getAncestors(name) {
+        const visited = {};
+        visited[name] = true;
 
         // FIFO
-        const queue = [node.name];
-        while (queue.length != 0) {
+        const queue = [name];
+        while (queue.length > 0) {
             const current = queue.shift();
 
             this.index[current].parents.forEach(parent => {
-                if(!visited.has(parent)) {
-                    visited.add(parent);
+                if(!(parent in visited)) {
+                    visited[parent] = true;
                     queue.push(parent);
                 }
             });
         }
 
-        return Array.from(visited);
+        return Object.keys(visited);
     }
 
-    getDescendants(node) {
-        const visited = new Set();
+    getDescendants(name) {
+        const visited = {};
+        visited[name] = true;
 
         // FIFO
-        const queue = [node.name];
-        while (queue.length != 0) {
+        const queue = [name];
+        while (queue.length > 0) {
             const current = queue.shift();
 
-            this.index[current].children.forEach(children => {
-                if(!visited.has(children)) {
-                    visited.add(children);
-                    queue.push(children);
+            this.index[current].children.forEach(child => {
+                if(!(child in visited)) {
+                    visited[child] = true;
+                    queue.push(child);
                 }
             });
         }
 
-        return Array.from(visited);
+        return Object.keys(visited);
     }
 
     generateGraph(responses) {
@@ -104,9 +112,8 @@ class DependencyModel {
 
         this.index = {};
         this.node_list = Object.keys(packages).map(name => {
-            const node = this.generateNode(name, packages[name]);
-            this.index[name] = node;
-            return node;
+            this.index[name] = this.generateNode(name, packages[name]);
+            return this.index[name];
         });
 
         const tmp = [];
@@ -130,9 +137,8 @@ class DependencyModel {
                 this.index[parent].children.push(node.name);
             }, this);
             
-            if (node.name in downloads) {
-                this.index[node.name]["downloads"] = downloads[node.name];
-            }
+            if (node.name in downloads) this.index[node.name]["downloads"] = downloads[node.name];
+            
         }, this);
 
         this.node_list = this.node_list.concat(tmp);
@@ -176,7 +182,7 @@ class DependencyModel {
             target.parents.forEach(source => {
                 this.link_list.push({
                     source,
-                    target
+                    target: target.name
                 });
             }, this);
         }, this);

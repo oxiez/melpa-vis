@@ -24,19 +24,29 @@ export default class ForceSimulation {
         
         // There seems to be a bug with adding new nodes
         // see https://github.com/danielcaldas/react-d3-graph/issues/143
-        this.force = d3.forceSimulation()
-                       .on("tick", this.listener)
-                       .force("charge", d3.forceManyBody()
-                                          .strength(this.force_repulse))
-                       .nodes(nodes)
-                       .force("link", d3.forceLink(links)
-                                        .id(node => node.name)
-                                        .distance(this.link_distance))
-                       .force("x", d3.forceX(900))
-                       .force("y", d3.forceY(600))
-                       .alpha(1)
-                       .alphaTarget(0)
-                       .restart();
+        // this.force = d3.forceSimulation()
+        //                .on("tick", this.listener)
+        //                .force("charge", d3.forceManyBody()
+        //                                   .strength(this.force_repulse))
+        //                .nodes(nodes)
+        //                .force("link", d3.forceLink(links)
+        //                                 .id(node => node.name)
+        //                                 .distance(this.link_distance))
+        //                .force("x", d3.forceX(900))
+        //                .force("y", d3.forceY(600))
+        //                .alpha(1)
+        //                .alphaTarget(0)
+        //                .restart();
+
+        this.force
+            .nodes(nodes)
+            .force("link", d3.forceLink(links)
+                             .id(node => node.name)
+                             .distance(this.link_distance))
+            .alpha(1)
+            .alphaTarget(0)
+            .restart();
+
     }
 
     /**
