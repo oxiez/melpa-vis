@@ -5,68 +5,70 @@ export default class DependencyGraphView {
                 width = "100%",
                 height = "100%",
                 line_opacity = 0.5) {
-        
+
         this.svg = d3.select(selector)
                      .append("svg")
                      .attr("width", width)
                      .attr("height", height);
 
-        this.svg
+        this.g = this.svg
             .append("g")
             .attr("class", "all");
 
-        this.g = this.svg
-                     .select("g.all");
-
-        this.zoom =
-            d3.zoom()
-              .scaleExtent([0.065,8])
-              .on("zoom",
-                  () => this.g.attr("transform", d3.event.transform)
-                 );
+        this.zoom = d3.zoom()
+                      .scaleExtent([0.04,6])
+                      .on("zoom", () => this.g.attr("transform", d3.event.transform) );
         
         this.svg
             .call(this.zoom)
             .call(this.zoom.transform,
                   d3.zoomIdentity
-                    .translate(700, 400)
+                    .translate(900, 600)
                     .scale(0.065));
-        
+
         // Ensure nodes on top
-        this.svg
-            .select("g.all")
-            .append("g")
-            .attr("class", "links")
-            .attr("stroke", "#474747")
-            .attr("stroke-width", "2")
-            .attr("stroke-opacity", line_opacity);
+        this.links = this.g
+                         .append("g")
+                         .attr("class", "links")
+                         .attr("stroke", "#474747")
+                         .attr("stroke-width", "2")
+                         .attr("stroke-opacity", line_opacity);
+                
+        this.nodes = this.g
+                         .append("g")
+                         .attr("class", "nodes");
 
-        this.links = this.svg
-                         .select("g.all")
-                         .select("g.links");
-        
-        this.svg
-            .select("g.all")
-            .append("g")
-            .attr("class", "nodes");
-
-        this.nodes = this.svg
-                         .select("g.all")
-                         .select("g.nodes");
+        this.info = this.g
+                        .append("g")
+                        .attr("class", "info");
 
         this.search = d3.select("#search");
         this.downloads = d3.select("#downloads");
         this.d_not_null = d3.select("#dnotnull");
         this.filter = d3.select("#filter");
-        this.clear = d3.select("#clear");
+        this.pause_button = d3.select("#pause");
     }
 
-    registerListeners(filter, clear) {
-        this.filter
-            .on("click", filter);
+    registerListeners(filter, pause) {
+        this.filter.on("click", filter);
 
-        this.clear
-            .on("click", clear);
+        this.pause_button.on("click", pause);
+    }
+
+    pause(resume, onHover) {
+        this.pause_button.property("value", "Resume");
+        const pause_listener = this.pause_button.on("click");
+
+        
+        this.pause_button.on("click", () => {
+            resume();
+            this.pause_button.on("click", pause_listener);
+            this.pause_button.property("value", "Pause");
+
+            this.info
+                .selectAll("boxes")
+                .remove();
+        });
     }
 
     get filters() {
@@ -105,9 +107,9 @@ export default class DependencyGraphView {
 
     scaleNode(node) {        
         if (node["downloads"] != null) {
-            return (2*Math.log(node["downloads"])) + 3;
+            return (2*Math.log(node["downloads"])) + 2;
         } else {
-            return 3;
+            return 2;
         }
     }
 

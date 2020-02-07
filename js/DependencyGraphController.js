@@ -15,14 +15,12 @@ export default class DependencyGraphController {
         this.model = model;
         this.view = view;
 
-        view.registerListeners(this.filter.bind(this),
-                               this.clear.bind(this));
+        view.registerListeners(this.filter.bind(this), this.pause.bind(this));
         simulation.registerListener(this.onTick.bind(this));
 
         model.then(data => {
+            // Use default filtering options
             this.filter();
-            // view.displayGraph(data.nodes, data.links);
-            // simulation.updateGraph(data.nodes, data.links);
         });
     }
 
@@ -30,18 +28,25 @@ export default class DependencyGraphController {
         this.model.then(data => {
             const results = data.getFilteredResults(this.view.filters);
 
-            if (results.nodes.length !== 0) {                
-                this.view.displayGraph(results.nodes, results.links);
+            if (results.nodes.length !== 0) {
                 this.simulation.updateGraph(results.nodes, results.links);
+                this.view.displayGraph(results.nodes, results.links);
             } else {
                 console.log("No results found.");
             }
         });
     }
 
-    clear() {
-        
+    // Enables highlighting of packages
+    pause() {
+        this.simulation.pause();
+        this.view.pause(this.resume.bind(this));
     }
+
+    resume() {
+        this.simulation.resume();
+    }
+    
 
     onTick() {
         this.view.onTick.bind(this.view)();

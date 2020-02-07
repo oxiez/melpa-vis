@@ -6,13 +6,13 @@
   </head>
   <body>
     <div id="header">
-      <h2>MELPA (Milkyman's Emacs Lisp Package Archive) Dependency Graph</h2>
+      <h2>MELPA (Milkypostman's Emacs Lisp Package Archive) Dependency Graph</h2>
       <div id="interaction">
         Package: <input type="text" name="searchname" id="search" value="">
         Downloads: <input type="number" name="downloadmin" min="0" step="10000" value="100000" id="downloads">
-        <input type="checkbox" name="downloadnotnull" id="dnotnull"> Hide unknown downloads
+        <input type="checkbox" name="downloadnotnull" id="dnotnull" checked="false"> Hide GNU (Non-MELPA) packages
         <input type="button" name="filter" value="Filter" id="filter">
-        <input type="button" name="clear" value="Clear Filters (WARNING: Slow)" id="clear">
+        <input type="button" name="pause" value="Pause" id="pause">
       </div>
     </div>
     <div id="graph_div"></div>
