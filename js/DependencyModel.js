@@ -32,22 +32,28 @@ class DependencyModel {
         const downloads = filters.downloads;
         const dnotnull = filters.dnotnull;
 
-        let nodes = Object.keys(this.index);
+        let nodes = Object.keys(this.index);;
 
         if(search !== "" && search in this.index) {
-            nodes = this.getAncestors(search); // .concat(this.getDescendants(search));
-            nodes.push(search);
+            nodes = [];
+            if (filters.dependencies)
+                nodes = nodes.concat(this.getAncestors(search));
+
+            if (filters.descendants)
+                nodes = nodes.concat(this.getDescendants(search));
+        } else if (search !== "") {
+            nodes = [];
         }
 
         nodes = nodes.filter(name => {
             if (this.index[name]["downloads"] != null && this.index[name]["downloads"] >= downloads)
                 return true;
 
-            if (this.index[name]["downloads"] === undefined && dnotnull === false)
+            if (this.index[name]["downloads"] == null && dnotnull === false)
                 return true;
 
             return false;
-        });
+        }, this);
 
         const test = {};
         nodes.forEach(name => test[name] = this.index[name], this);
@@ -56,7 +62,7 @@ class DependencyModel {
             return (link.source.name in test) && (link.target.name in test);
         });
         
-        return { nodes: nodes.map(name => this.index[name], this) , links };
+        return { nodes: Object.values(test) , links };
     }
 
     getAncestors(name) {

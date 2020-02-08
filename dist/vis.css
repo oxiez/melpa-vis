@@ -11,9 +11,48 @@ div {
     margin: 0px 8px 0px 8px;
 }
 
+svg text.info {
+    font: bold 50px sans-serif;
+}
+
 #header {
-    height: 10%;
+    height: 12%;
     margin-top: 10px;
+}
+
+.legend {
+    float: right;
+    margin-right: 8px;
+    text-align: center;
+    font: bold 16px sans-serif;
+}
+
+#legend_languages {
+    color: #377eb8;
+}
+#legend_convenience {
+    color: #4daf4a;
+}
+#legend_look {
+    color: #984ea3;
+}
+#legend_completion {
+    color: #f781bf;
+}
+#legend_games {
+    color: #e41a1c;
+}
+#legend_tools {
+    color: #ff7f00;
+}
+#legend_tex {
+    color: #a65628;
+}
+#legend_comm {
+    color: #ffff33;
+}
+#legend_elpa {
+    color: #e6ab02;
 }
 
 #graph_div {

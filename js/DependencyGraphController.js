@@ -32,7 +32,7 @@ export default class DependencyGraphController {
                 this.simulation.updateGraph(results.nodes, results.links);
                 this.view.displayGraph(results.nodes, results.links);
             } else {
-                console.log("No results found.");
+                window.alert("No packages matched your query.");
             }
         });
     }

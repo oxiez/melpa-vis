@@ -9,10 +9,22 @@
       <h2>MELPA (Milkypostman's Emacs Lisp Package Archive) Dependency Graph</h2>
       <div id="interaction">
         Package: <input type="text" name="searchname" id="search" value="">
-        Downloads: <input type="number" name="downloadmin" min="0" step="10000" value="100000" id="downloads">
-        <input type="checkbox" name="downloadnotnull" id="dnotnull" checked="false"> Hide GNU (Non-MELPA) packages
+        <input type="checkbox" name="descendants" id="descendants" checked="true"> Descendants
+        <input type="checkbox" name="dependencies" id="dependencies" checked="true"> Dependencies
+        Downloads: <input type="number" name="downloadmin" min="0" step="10000" value="40000" id="downloads">
+        <input type="checkbox" name="downloadnotnull" id="dnotnull" checked="false"> Hide ELPA packages
+        <br>
         <input type="button" name="filter" value="Filter" id="filter">
         <input type="button" name="pause" value="Pause" id="pause">
+        <div class="legend" id="legend_languages">Programming</div>
+        <div class="legend" id="legend_convenience">Convenience</div>
+        <div class="legend" id="legend_look">Look & Feel</div>
+        <div class="legend" id="legend_completion">Auto-Completion</div>
+        <div class="legend" id="legend_games">Games</div>
+        <div class="legend" id="legend_tools">Tools</div>
+        <div class="legend" id="legend_tex">Latex</div>
+        <div class="legend" id="legend_comm">Internet Tools</div>
+        <div class="legend" id="legend_elpa">ELPA Packages</div>
       </div>
     </div>
     <div id="graph_div"></div>
