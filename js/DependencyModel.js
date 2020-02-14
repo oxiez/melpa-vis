@@ -23,7 +23,7 @@ class DependencyModel {
 
     get nodes() { return this.node_list; }
     get links() { return this.link_list; }
-
+    
     /**
      * Returns a filtered node list and link list
      */
@@ -31,18 +31,16 @@ class DependencyModel {
         const search = filters.search;
         const downloads = filters.downloads;
         const dnotnull = filters.dnotnull;
+        let metric_range = [0,1];
 
         console.log(dnotnull);
 
         let nodes = Object.keys(this.index);;
 
         if(search !== "" && search in this.index) {
-            nodes = [];
-            if (filters.dependencies)
-                nodes = nodes.concat(this.getAncestors(search));
-
-            if (filters.descendants)
-                nodes = nodes.concat(this.getDescendants(search));
+            const results = this.computeDistances(search, filters.dependencies, filters.descendants);
+            nodes = results.visited;
+            metric_range = results.range;
         } else if (search !== "") {
             nodes = [];
         }
@@ -63,8 +61,10 @@ class DependencyModel {
         const links = this.links.filter((link, index) => {
             return (link.source.name in test) && (link.target.name in test);
         });
+
+        console.debug("model:" + metric_range);
         
-        return { nodes: Object.values(test) , links };
+        return { nodes: Object.values(test) , links, metric_range, search};
     }
 
     getAncestors(name) {
@@ -134,7 +134,8 @@ class DependencyModel {
                         desc: "A package not listed in MELPA.",
                         keywords: [],
                         parents: [],
-                        children: []
+                        children: [],
+                        distances: {}
                     };
 
                     tmp.push(this.index[parent]);
@@ -174,7 +175,8 @@ class DependencyModel {
             authors,
             keywords,
             parents,
-            children: []
+            children: [],
+            distances: {}
         };
     }
 
@@ -193,4 +195,61 @@ class DependencyModel {
             }, this);
         }, this);
     }
+
+    computeDistances(source, travel_parents, travel_children) {
+        let layerParents = [this.index[source]];
+        let layerChildren = [this.index[source]];
+        const visited = new Set([source]);
+
+        for(const node of this.node_list) {
+            node.distances[source] = null;
+        }
+
+        this.index[source].distances[source] = 0;
+
+        let counter = 0;
+        if(travel_parents) {
+            while(layerParents.length > 0) {
+                counter++;
+                const next = [];
+                for(const node of layerParents) {
+                    for(const parent of node.parents) {
+                        if(!visited.has(parent)) {
+                            this.index[parent].distances[source] = counter;
+                            next.push(this.index[parent]);
+                            visited.add(parent);
+                        }
+                    }
+                }
+                layerParents = next;
+            }
+        }
+        let max_dist = counter - 1;
+
+        counter = 0;
+        if(travel_children) {
+            while(layerChildren.length > 0) {
+                counter++;
+                const next = [];
+                for(const node of layerChildren) {
+                    for(const child of node.children) {
+                        const child_node = this.index[child];
+                        if(!visited.has(child)) {
+                            child_node.distances[source] = counter;
+                            next.push(child_node);
+                            visited.add(child);
+                        } else if(child_node.distances[source] >= counter) {
+                            child_node.distances[source] = counter;
+                            next.push(child_node);
+                        }
+                    }
+                }
+                layerChildren = next;
+            }
+        }
+        max_dist = Math.max(max_dist, counter - 1);
+        
+        return {visited: Array.from(visited), range: [0, max_dist]};
+    }
+
 }

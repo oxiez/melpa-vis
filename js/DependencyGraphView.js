@@ -68,7 +68,6 @@ export default class DependencyGraphView {
         this.links = this.g
                          .append("g")
                          .attr("class", "links")
-                         .attr("stroke", "#474747")
                          .attr("stroke-width", "2")
                          .attr("stroke-opacity", line_opacity);
                 
@@ -159,10 +158,19 @@ export default class DependencyGraphView {
                         .attr("text-anchor", "middle");
     }
 
-    onColorChange(nodeColor) {
+    onColorChange(node_color, link_color, node_stroke) {
         this.nodes
             .selectAll("circle.node")
-            .attr("fill", nodeColor);
+            .attr("fill", node_color)
+            .attr("stroke", node_stroke)
+            .attr("stroke-width", "20");
+
+        this.links
+            .selectAll("line.link")
+            .attr("stroke", link_color);
+
+        this.text
+            .attr("fill", link_color);
     }
 
     scaleNode(node) {        

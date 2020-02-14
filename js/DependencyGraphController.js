@@ -29,19 +29,21 @@ export default class DependencyGraphController {
     }
 
     onColorChange() {
-        const nodeColorFunc = this.palette.onColorChange();
-        this.view.onColorChange(nodeColorFunc);
+        const nodeColorFunc = this.palette.onColorChange(this.source, this.metric_range);
+        this.view.onColorChange(nodeColorFunc, this.palette.link_color, this.palette.node_stroke);
     }
 
     filter() {
         this.model.then(data => {
             const results = data.getFilteredResults(this.view.filters);
+            this.metric_range = results.metric_range; // Save for later use
+            this.source = results.search;
 
             if (results.nodes.length !== 0) {
                 this.simulation.updateGraph(results.nodes, results.links);
                 this.view.displayGraph(results.nodes, results.links);
-                const nodeColorFunc = this.palette.onColorChange();
-                this.view.onColorChange(nodeColorFunc);
+                const nodeColorFunc = this.palette.onColorChange(results.search, results.metric_range);
+                this.view.onColorChange(nodeColorFunc, this.palette.link_color, this.palette.node_stroke);
             } else {
                 window.alert("No packages matched your query.");
             }

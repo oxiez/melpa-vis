@@ -17,11 +17,33 @@ const keyword_groups = {
     "extensions": "tools",
     "calendar": "tools",
     "tex": "latex",
-    "bib": "late",
+    "bib": "latex",
     "biblatex": "latex",
     "latex": "latex",
     "bibtex": "latex",
     "comm": "comm"
+};
+
+const simple_groups = {
+    "languages": "languages",
+    "convenience": "convenience",
+    "theme": "look",
+    "themes": "look",
+    "faces": "look",
+    "completion": "convenience",
+    "company": "convenience",
+    "auto-complete": "convenience",
+    "games": "convenience",
+    "tools": "convenience",
+    "util": "convenience",
+    "extensions": "convenience",
+    "calendar": "convenience",
+    "tex": "languages",
+    "bib": "languages",
+    "biblatex": "languages",
+    "latex": "languages",
+    "bibtex": "languages",
+    "comm": "convenience"
 };
 
 const labels = {
@@ -60,27 +82,64 @@ export default class PaletteSelector {
 
         this.legend = d3.select(selector)
                         .select("ul");
+
     }
+
+    get colorPaletteId() { return this.select.property("value"); }
 
     get background() { return this.palette.background; }
 
-    get nodeColorFunc() {
+    nodeColorFunc(keyword_mapping) {
         return (function(node) {
             if (node.downloads == null) return this.palette.groups.elpa;
             if (!node.keywords) return this.palette.groups.default;
         
             for(const keyword of node.keywords) {
-                if (keyword in keyword_groups)
+                if (keyword in keyword_mapping)
                     return this.palette
-                               .groups[keyword_groups[keyword]];
+                               .groups[keyword_mapping[keyword]];
             }
 
             return this.palette.groups.default;
         }).bind(this);
     }
 
-    onColorChange() {    
+    get link_color() { return this.palette.links; }
+
+    get node_stroke() { return this.palette.node_stroke; }
+
+    onColorChange(source, metric_range) {
+        this.palette = this.palettes[this.colorPaletteId];
+
+        this.body
+            .style("background-color", this.palette.background)
+            .style("color", this.palette.text);
+            
+        
         if(this.palette.metric === "categorical") {
+            const legend =
+              Object.keys(this.palette.groups)
+                    .map(group => { return {
+                        color: this.palette.groups[group],
+                        label: labels[group]
+                    }; });
+
+            this.legend
+                .selectAll("li")
+                .remove();
+
+            this.legend
+                .selectAll("li")
+                .data(legend)
+                .enter()
+                .append("li")
+                .attr("class", "legend")
+                .style("color", group =>  group.color)
+                .text(group => group.label);
+
+            return this.nodeColorFunc(keyword_groups);
+
+        } else if(this.palette.metric === "simple") {
             const legend =
               Object.keys(this.palette.groups)
                     .map(group => { return {
@@ -99,12 +158,20 @@ export default class PaletteSelector {
                 .enter()
                 .append("li")
                 .attr("class", "legend")
-                .attr("style", group => "color:" + group.color)
+                .style("color", group => group.color)
                 .text(group => group.label);
 
+            return this.nodeColorFunc(simple_groups);
+        } else if(this.palette.metric === "distance") {
+            return node => {
+                console.log(node.name + node.distances[source] + metric_range[1]);
+                return d3.interpolateOrRd(node.distances[source] / metric_range[1]);
+            };
+        } else { // B & W
+            this.legend.selectAll("li").remove();
+            
+            return this.palette.groups;
         }
-
-        return this.nodeColorFunc;
     }
 
 
