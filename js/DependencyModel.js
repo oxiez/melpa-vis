@@ -32,6 +32,8 @@ class DependencyModel {
         const downloads = filters.downloads;
         const dnotnull = filters.dnotnull;
 
+        console.log(dnotnull);
+
         let nodes = Object.keys(this.index);;
 
         if(search !== "" && search in this.index) {

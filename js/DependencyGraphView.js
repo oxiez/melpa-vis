@@ -118,19 +118,6 @@ export default class DependencyGraphView {
             dependencies: this.dependencies.property("checked")
         };
     }
-
-    nodeColor(node) {
-        if (node.downloads == null) return "#e6ab02";
-        if (!node.keywords) return "#000000";
-        
-        for(const keyword of node.keywords) {
-            if (keyword in keyword_colors)
-                return keyword_colors[keyword];
-        }
-
-        return "#000000";
-    }
-
     
     displayGraph(nodes, links) {
         this.g
@@ -161,7 +148,6 @@ export default class DependencyGraphView {
             .attr("class", "node")
             .attr("id", node => node.name)
             .attr("r", node => this.scaleNode(node))
-            .attr("fill", this.nodeColor)
             .on("mouseover", this.mouseOver.bind(this))
             .on("mouseout", this.mouseOut.bind(this));
 
@@ -173,11 +159,17 @@ export default class DependencyGraphView {
                         .attr("text-anchor", "middle");
     }
 
+    onColorChange(nodeColor) {
+        this.nodes
+            .selectAll("circle.node")
+            .attr("fill", nodeColor);
+    }
+
     scaleNode(node) {        
         if (node["downloads"] != null) {
-            return (2*Math.log(node["downloads"])) + 2;
+            return (4*Math.log(node["downloads"])) + 2;
         } else {
-            return 40;
+            return 100;
         }
     }
 
@@ -208,7 +200,7 @@ export default class DependencyGraphView {
             rad = (2*Math.log(node.downloads)) + 2;
         }
         
-        this.text.attr("transform", "translate(" + node.x + "," + (node.y - rad - 10)+ ")")
+        this.text.attr("transform", "translate(" + node.x + "," + (node.y - rad - 30)+ ")")
             .text(node.name + ": " + downloads + " downloads")
             .attr("display", null);
     }
