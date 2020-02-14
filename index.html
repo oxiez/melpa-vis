@@ -40,7 +40,9 @@
           "default",
           "Categories (Default)",
           null,
+          null,
           "categorical",
+          "#474747",
           {
               "default": "#000000",
               "elpa": "#e6ab02",
@@ -55,8 +57,122 @@
           }
       );
 
+      const default_pastel = new Palette(
+          "pastel",
+          "Categories (Pastel)",
+          null,
+          null,
+          "categorical",
+          "#474747",
+          {
+              "default": null,
+              "elpa": "#8dd3c7",
+              "languages": "#80b1d3", // Language specific modes
+              "convenience": "#b3de69", // Generic category
+              "look": "#bc80bd", // Look & Feel
+              "completion": "#fccde5", // Completion Frameworks
+              "games": "#fb8072", // Games
+              "tools": "#fdb462", // Utilities / Tools / Extensions
+              "latex": "#ffffb3", // LaTeX
+              "comm": "#bebada" // Internet Utility
+          }
+      );
+
+      const default_dark = new Palette(
+          "dark",
+          "Categories (Dark, Pastel)",
+          "#d9d9d9",
+          "#121212",
+          "categorical",
+          "#d9d9d9",
+          {
+              "default": "#d9d9d9",
+              "elpa": "#8dd3c7",
+              "languages": "#80b1d3", // Language specific modes
+              "convenience": "#b3de69", // Generic category
+              "look": "#bc80bd", // Look & Feel
+              "completion": "#fccde5", // Completion Frameworks
+              "games": "#fb8072", // Games
+              "tools": "#fdb462", // Utilities / Tools / Extensions
+              "latex": "#ffffb3", // LaTeX
+              "comm": "#bebada" // Internet Utility
+          }
+      );
+
+      const colorblind = new Palette(
+          "colorblind",
+          "Categories (Colorblind Safe)",
+                    null,
+          null,
+          "simple",
+          "#474747",
+          {
+              "default": "#000000",
+              "elpa": "#a6cee3",
+              "languages": "#1f78b4", // Language specific modes
+              "convenience": "#b2df8a", // Generic category
+              "look": "#33a02c", // Look & Feel
+          }
+      );
+
+      const dark_colorblind = new Palette(
+          "dark_colorblind",
+          "Categories (Dark, Colorblind Safe)",
+          "#d9d9d9",
+          "#121212",
+          "simple",
+          "#d9d9d9",
+          {
+              "default": "#d9d9d9",
+              "elpa": "#a6cee3",
+              "languages": "#1f78b4", // Language specific modes
+              "convenience": "#b2df8a", // Generic category
+              "look": "#33a02c", // Look & Feel
+          }
+      );
+
+      const bw = new Palette(
+          "bw",
+          "No Color (Filled)",
+          null,
+          null,
+          null,
+          "#474747",
+          { },
+      );
+
+
+      const outline = new Palette(
+          "outline",
+          "No Color (Outline)",
+          null,
+          null,
+          null,
+          "#474747",
+          { "default": "#FFFFFF" },
+          "#000000"
+      );
+
+      const distance = new Palette(
+          "distance",
+          "Distance to Node",
+          null,
+          null,
+          "distance",
+          "#474747",
+          { }
+      );
+
+
       const palettes = {
-          "default": default_palette
+          "default": default_palette,
+          "pastel": default_pastel,
+          "dark": default_dark,
+          "colorblind": colorblind,
+          "dark_colorblind": dark_colorblind,
+          "bw": bw,
+          "outline": outline,
+          "distance": distance
       };
       
       const palette_selector = new PaletteSelector("#color_div", palettes);
