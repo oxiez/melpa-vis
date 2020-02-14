@@ -8,7 +8,15 @@ h2 {
 }
 
 div {
-    margin: 0px 8px 0px 8px;
+    margin: 0;
+}
+
+#header {
+    padding: 8px;
+}
+
+#application {
+    padding: 8px;
 }
 
 svg text.info {
@@ -16,45 +24,29 @@ svg text.info {
 }
 
 #header {
-    height: 12%;
-    margin-top: 10px;
+    height: 50px;
+}
+
+#legend_list {
+    padding: 0px 0px 0px 20px;
 }
 
 .legend {
-    float: right;
-    margin-right: 8px;
-    text-align: center;
     font: bold 16px sans-serif;
 }
 
-#legend_languages {
-    color: #377eb8;
+#application {
+    height: 95%;
 }
-#legend_convenience {
-    color: #4daf4a;
-}
-#legend_look {
-    color: #984ea3;
-}
-#legend_completion {
-    color: #f781bf;
-}
-#legend_games {
-    color: #e41a1c;
-}
-#legend_tools {
-    color: #ff7f00;
-}
-#legend_tex {
-    color: #a65628;
-}
-#legend_comm {
-    color: #ffff33;
-}
-#legend_elpa {
-    color: #e6ab02;
+
+#interaction {
+    float: left;
+    width: 15%;
+    height: 100%;
 }
 
 #graph_div {
-    height: 85%;
+    height: 100%;
+    float: right;
+    width: 80%;
 }
