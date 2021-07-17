@@ -1,27 +1,6 @@
 import * as d3 from "d3";
 
-// From colorbrewer
-const keyword_colors = {
-    "languages": "#377eb8", // Language specific modes
-    "convenience": "#4daf4a", // Generic category
-    "theme": "#984ea3", // Look & Feel
-    "themes": "#984ea3",
-    "faces": "#984ea3",
-    "completion": "#f781bf", // Completion Frameworks
-    "company": "#f781bf",
-    "auto-complete": "#f781bf",
-    "games": "#e41a1c", // Games
-    "tools": "#ff7f00", // Utilities / Tools / Extensions
-    "util": "#ff7f00",
-    "extensions": "#ff7f00",
-    "calendar": "#ff7f00",
-    "tex": "#a65628", // LaTeX
-    "bib": "#a65628",
-    "biblatex": "#a65628",
-    "latex": "#a65628",
-    "bibtex": "#a65628",
-    "comm": "#ffff33" // Internet Utility
-};
+const DEFAULT_RADIUS = 100;
 
 export default class DependencyGraphView {
     constructor(selector,
@@ -177,7 +156,7 @@ export default class DependencyGraphView {
         if (node["downloads"] != null) {
             return (4*Math.log(node["downloads"])) + 2;
         } else {
-            return 100;
+            return DEFAULT_RADIUS;
         }
     }
 
@@ -202,10 +181,9 @@ export default class DependencyGraphView {
 
     mouseOver(node) {
         let downloads = "?";
-        let rad = 2;
+        let rad = this.scaleNode(node);
         if (node.downloads != null) {
             downloads = node.downloads;
-            rad = (2*Math.log(node.downloads)) + 2;
         }
         
         this.text.attr("transform", "translate(" + node.x + "," + (node.y - rad - 30)+ ")")
